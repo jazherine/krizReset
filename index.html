@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
     <title>Zihinsel Alan / Dur ve Odaklan</title>
     <style>
         :root {
@@ -14,6 +14,8 @@
             --game-target: #4ade80;
             --border: #223147;
             --success: #15803d;
+            --success-bright: #22c55e;
+            --danger: #ef4444;
         }
 
         body {
@@ -24,27 +26,40 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            line-height: 1.6;
-            transition: background-color 0.1s linear; /* Ekranın yeşile dönme animasyonu için */
+            line-height: 1.5;
+            transition: background-color 0.1s linear;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* İç Kaydırmayı Engelleyen ve Bütünlüğü Sağlayan Ana Taşıyıcı */
         .wrapper {
             display: flex;
-            max-width: 1100px;
+            flex-direction: row;
+            max-width: 1200px;
             width: 100%;
             gap: 20px;
             transition: opacity 0.5s ease;
+            align-items: stretch;
         }
 
         .left-panel {
             flex: 1.2;
             background-color: var(--card-bg);
-            padding: 40px;
+            padding: 35px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: auto; /* İç kaydırma çubukları tamamen kaldırıldı */
+            overflow: visible;
         }
 
         .right-panel {
@@ -56,58 +71,109 @@
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            gap: 15px;
+            height: auto;
+            overflow: visible;
         }
 
-        h1, h2 {
+        h1, h2, h3 {
             font-weight: 600;
             color: var(--accent);
             margin-top: 0;
             letter-spacing: -0.5px;
         }
 
-        h1 { font-size: 24px; margin-bottom: 24px; }
-        h2 { font-size: 20px; margin-bottom: 15px; }
+        h1 { font-size: 24px; margin-bottom: 20px; text-align: left; }
+        h2 { font-size: 18px; margin-bottom: 4px; color: var(--text-main); }
+        h3 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
 
-        p { margin-bottom: 20px; font-size: 15px; }
+        p { margin-bottom: 15px; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
         .highlight { color: var(--accent); font-weight: 500; }
 
-        .steps { margin: 20px 0; padding: 0; list-style: none; }
-        .steps li { position: relative; padding-left: 25px; margin-bottom: 12px; font-size: 14px; }
-        .steps li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--accent); font-weight: bold; }
+        .steps { margin: 15px 0; padding: 0; list-style: none; }
+        .steps li { position: relative; padding-left: 25px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; color: var(--text-main); }
+        .steps li::before { content: "✓"; position: absolute; left: 0; top: 2px; color: var(--accent); font-weight: bold; }
 
-        /* Butonlar */
         .primary-btn {
             display: block;
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background-color: var(--accent);
             color: var(--bg-color);
             border: none;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
-            margin-bottom: 25px;
-            transition: background 0.2s;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+            animation: pulseButton 2s infinite;
+        }
+
+        @keyframes pulseButton {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.5); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
         }
 
         .audio-ctrl-btn {
-            display: none; /* İlk başta gizli */
+            display: none;
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: transparent;
             color: var(--text-main);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+        }
+
+        /* YENİ NESİL ANİMASYONLU 5 DAKİKA SAYAÇ ALANI */
+        .session-timer-box {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(56, 189, 248, 0.04);
+            border: 1px dashed rgba(56, 189, 248, 0.25);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .countdown-ring-svg {
+            transform: rotate(-90deg);
+            width: 42px;
+            height: 42px;
+        }
+        .countdown-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 4;
+        }
+        .countdown-ring-circle {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 113;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+        }
+        .time-text-display {
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
         .feel-good-btn {
-            display: none; /* İlk başta gizli */
+            display: none;
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             background-color: var(--success);
             color: white;
             border: none;
@@ -115,54 +181,232 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: auto;
-            user-select: none; /* Metin seçilmeyi engellemek için */
+            margin-top: 10px;
+            user-select: none;
             -webkit-user-select: none;
         }
-
-        /* Oyun Alanı */
-        .game-area {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 10px;
-            cursor: crosshair;
-        }
-
-        .target {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: var(--game-target);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--game-target);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            display: none;
-        }
-
-        .score-board { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
 
         .breathing-box {
             text-align: center;
             padding: 15px;
             background-color: var(--bg-color);
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 15px 0;
             border: 1px solid var(--border);
             display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
-        .timer { font-size: 13px; color: var(--accent); font-weight: bold; text-transform: uppercase; }
-        .footer-note { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; margin-top: 20px; text-align: center; }
+        .timer {
+            font-size: 16px;
+            color: var(--text-main);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-        /* Tam Ekran Kapanış Modu */
+        .svg-container {
+            width: 100%;
+            height: 70px;
+            background: rgba(22, 31, 47, 0.2);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .svg-line {
+            stroke: var(--accent);
+            stroke-width: 5;
+            fill: none;
+            stroke-linecap: round;
+            transition: d 4s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.6s ease;
+        }
+
+        .station-section {
+            background: rgba(22, 31, 47, 0.4);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .game-launcher-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .game-launcher-btn:not(:disabled):hover {
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* ================= TAM EKRAN OYUN MODÜLLERİ ================= */
+        .fullscreen-game-container {
+            display: none;
+            background-color: var(--bg-color);
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .fullscreen-game-container:fullscreen {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .game-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 12px;
+            background: rgba(22, 31, 47, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .game-score { font-size: 15px; font-weight: bold; color: var(--text-main); }
+        .game-score span { color: var(--accent); }
+
+        .game-exit-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .canvas-area {
+            flex: 1;
+            width: 100%;
+            background-color: rgba(15, 20, 28, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .click-target {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-color: var(--game-target);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--game-target);
+            cursor: pointer;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 90%;
+            max-width: 320px;
+            margin: auto;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .matrix-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            height: 75px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .matrix-btn.active {
+            background-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .bubble-node {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(56, 189, 248, 0.2);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .color-match-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 20px;
+            padding: 10px;
+        }
+        .color-word { font-size: 38px; font-weight: 900; letter-spacing: 1px; }
+        .color-buttons-row { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            width: 100%; 
+            max-width: 340px; 
+        }
+        .color-pick-btn {
+            padding: 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            color: #0f141c;
+            cursor: pointer;
+        }
+
+        .math-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 25px;
+        }
+        .math-question { font-size: 46px; font-weight: 800; color: var(--text-main); font-family: monospace; }
+        .math-input-row { display: flex; gap: 10px; width: 100%; max-width: 280px; }
+        .math-input {
+            flex: 1;
+            padding: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 22px;
+            text-align: center;
+            font-family: monospace;
+            outline: none;
+        }
+        .math-submit-btn {
+            padding: 0 25px;
+            background: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
         .fullscreen-success {
             display: none;
             position: fixed;
@@ -172,9 +416,30 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
+            text-align: center;
+            padding: 20px;
             z-index: 9999;
+        }
+
+        /* RESPONSIVE FILTER */
+        @media (max-width: 820px) {
+            body { padding: 10px; align-items: flex-start; }
+            .wrapper { flex-direction: column; gap: 15px; }
+            .left-panel, .right-panel { width: 100%; flex: none; padding: 20px; height: auto; }
+            h1 { font-size: 20px; margin-bottom: 15px; }
+        }
+
+        @media (max-height: 540px) {
+            body { padding: 8px; }
+            .left-panel, .right-panel { padding: 15px; gap: 10px; }
+            h1 { font-size: 18px; margin-bottom: 8px; }
+            .svg-container { height: 50px; }
+            .color-buttons-row { grid-template-columns: repeat(4, 1fr); max-width: 100%; }
+            .matrix-grid { max-width: 250px; }
+            .matrix-btn { height: 48px; }
+            .math-question { font-size: 32px; }
         }
     </style>
 </head>
@@ -187,10 +452,23 @@
         <button class="primary-btn" id="start-session">ZİHNİNİ VE SESİ BAŞLAT</button>
         <button class="audio-ctrl-btn" id="audio-toggle">Şarkıyı Durdur</button>
         
-        <audio id="crisis-audio" src="durbidakika.mp3" preload="auto"></audio>
+        <div class="session-timer-box" id="session-timer-box">
+            <svg class="countdown-ring-svg">
+                <circle class="countdown-ring-bg" cx="21" cy="21" r="18" />
+                <circle class="countdown-ring-circle" id="countdown-ring" cx="21" cy="21" r="18" />
+            </svg>
+            <div class="time-text-display" id="time-text-display">05:00</div>
+        </div>
+        
+        <audio id="crisis-audio" src="durbidakika.mp3" preload="auto" loop></audio>
 
         <div class="breathing-box" id="b-box">
-            <div class="timer" id="breath-text">Zihnini yavaşlatmak için sayfaya odaklan...</div>
+            <div class="timer" id="breath-text">Sakinleşmek için çizgi ritmine odaklan...</div>
+            <div class="svg-container">
+                <svg width="100%" height="100%" viewBox="0 0 600 140" preserveAspectRatio="none">
+                    <path class="svg-line" id="breath-path" d="M 0 70 Q 150 70, 300 70 T 600 70" />
+                </svg>
+            </div>
         </div>
 
         <p>Bu sayfayı açtın çünkü şu an beyninin ilkel kısmı seni <span class="highlight">bağımlı bir davranışa</span> doğru sürüklüyor. Bu geçici bir kimyasal dalgadır, emir değildir.</p>
@@ -200,26 +478,129 @@
             <li><strong>Yanılsama:</strong> Bu davranış sana huzur vermeyecek, sadece derin bir pişmanlık getirecek.</li>
             <li><strong>Zaman Sınırı:</strong> Bu yoğun fiziksel baskı en fazla 10-15 dakika sürer, sonra kendiliğinden söner.</li>
             <li><strong>Nörolojik Gelişim:</strong> Şu an "hayır" dediğin her saniye, eski bağımlılık yollarını fiziksel olarak zayıflatıyorsun.</li>
+            <li><strong>Kimyasal Tuzak:</strong> Dopamin reseptörlerin şu an seni kandırıyor; arzuladığın şey gerçek bir ödül değil, sadece biyolojik bir kısır döngü.</li>
         </ul>
+
+        <h3>Taahhütlerim ve Sözlerim:</h3>
+        <ul class="steps" style="color: var(--text-muted);">
+            <li>Dürtü geldiğinde teslim olmayacağıma ve bu kriz ekranını tam konsantrasyonla tamamlayacağıma,</li>
+            <li>Anlık zevk arayışlarının gelecekteki benliğime vereceği zararı kabul ettiğime,</li>
+            <li>Kendi irademin, beynimin ilkel dopamin dürtülerinden çok daha güçlü olduğunu kanıtlayacağıma,</li>
+            <li>Buradaki görevleri bitirmeden ve aşağıdaki butona basılı tutarak kendimi tamamen sakinleştirmeden sayfayı terk etmeyeceğime söz veriyorum.</li>
+        </ul>
+
+        <p style="font-size: 11px; border-top: 1px solid var(--border); padding-top: 15px; margin-top: 15px; color: var(--text-muted); font-style: italic;">
+            * Aşağıdaki yeşil butona basılı tutarak sayfayı kapattığınızda, yukarıdaki tüm maddeleri rasyonel beyninizle onaylamış ve kendinize verdiğiniz sözü mühürlemiş sayılırsınız.
+        </p>
     </div>
 
     <div class="right-panel">
-        <h2>Dikkat Dağıtma İstasyonu</h2>
-        <p style="font-size: 13px; color: var(--text-muted);">Yeşil küreleri yakalayarak acil dürtü odağını fiziksel bir göreve kaydır.</p>
+        <h2 style="color:var(--accent); font-size:18px; margin-top:0; margin-bottom:5px;">Dikkat Dağıtma İstasyonları</h2>
         
-        <div class="score-board">Skor: <span id="score-val" class="highlight">0</span></div>
-        
-        <div class="game-area" id="g-area">
-            <div class="target" id="game-target"></div>
+        <div class="station-section">
+            <h2>İstasyon 1: Küre Avı</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Yeşil küreleri yakalayarak acil dürtü odağını kaydır.</p>
+            <button class="game-launcher-btn" id="btn-launch-1" disabled>Oyun Kilitli (Önce Başlatın)</button>
         </div>
 
-        <button class="feel-good-btn" id="feel-good">İyi Hissediyorum (Basılı Tut)</button>
+        <div class="station-section">
+            <h2>İstasyon 2: Hafıza Matrisi</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Yanan sıralı panelleri aklında tut ve aynı sırayla tekrar et.</p>
+            <button class="game-launcher-btn" id="btn-launch-2" disabled>Oyun Kilitli (Önce Başlatın)</button>
+        </div>
+
+        <div class="station-section">
+            <h2>İstasyon 3: Zen Balon Patlatma</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Aşağıdan yükselen baloncukları kaçırmadan yakala.</p>
+            <button class="game-launcher-btn" id="btn-launch-3" disabled>Oyun Kilitli (Önce Başlatın)</button>
+        </div>
+
+        <div class="station-section">
+            <h2>İstasyon 4: Kaos Engelleyici</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Kelimenin ne yazdığına değil, yazıldığı renge odaklan.</p>
+            <button class="game-launcher-btn" id="btn-launch-4" disabled>Oyun Kilitli (Önce Başlatın)</button>
+        </div>
+
+        <div class="station-section">
+            <h2>İstasyon 5: Odaklanma Denklemi</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Hızlı matematik sorularını çözerek analitik beynini devreye sok.</p>
+            <button class="game-launcher-btn" id="btn-launch-5" disabled>Oyun Kilitli (Önce Başlatın)</button>
+        </div>
+
+        <button class="feel-good-btn" id="feel-good">Sözümü Onaylıyorum ve İyi Hissediyorum (Basılı Tut)</button>
+    </div>
+</div>
+
+<div class="fullscreen-game-container" id="container-game-1">
+    <div class="game-top-bar">
+        <div class="game-score">Küre Skoru: <span id="score-val-1">0</span></div>
+        <button class="game-exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
+    </div>
+    <div class="canvas-area" id="canvas-1">
+        <div class="click-target" id="target-1"></div>
+    </div>
+</div>
+
+<div class="fullscreen-game-container" id="container-game-2">
+    <div class="game-top-bar">
+        <div class="game-score">Hafıza Seviyesi: <span id="score-val-2">0</span></div>
+        <button class="game-exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
+    </div>
+    <div class="canvas-area">
+        <div class="matrix-grid">
+            <button class="matrix-btn" data-index="0"></button>
+            <button class="matrix-btn" data-index="1"></button>
+            <button class="matrix-btn" data-index="2"></button>
+            <button class="matrix-btn" data-index="3"></button>
+            <button class="matrix-btn" data-index="4"></button>
+            <button class="matrix-btn" data-index="5"></button>
+            <button class="matrix-btn" data-index="6"></button>
+            <button class="matrix-btn" data-index="7"></button>
+            <button class="matrix-btn" data-index="8"></button>
+        </div>
+    </div>
+</div>
+
+<div class="fullscreen-game-container" id="container-game-3">
+    <div class="game-top-bar">
+        <div class="game-score">Balon: <span id="score-val-3">0</span></div>
+        <button class="game-exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
+    </div>
+    <div class="canvas-area" id="canvas-3"></div>
+</div>
+
+<div class="fullscreen-game-container" id="container-game-4">
+    <div class="game-top-bar">
+        <div class="game-score">Eşleştirme: <span id="score-val-4">0</span></div>
+        <button class="game-exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
+    </div>
+    <div class="canvas-area">
+        <div class="color-match-wrapper">
+            <div class="color-word" id="stroop-word">KIRMIZI</div>
+            <div class="color-buttons-row" id="stroop-options"></div>
+        </div>
+    </div>
+</div>
+
+<div class="fullscreen-game-container" id="container-game-5">
+    <div class="game-top-bar">
+        <div class="game-score">Denklem Skoru: <span id="score-val-5">0</span></div>
+        <button class="game-exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
+    </div>
+    <div class="canvas-area">
+        <div class="math-wrapper">
+            <div class="math-question" id="math-question">5 + 3</div>
+            <div class="math-input-row">
+                <input type="number" class="math-input" id="math-input" placeholder="?" pattern="[0-9]*" inputmode="numeric">
+                <button class="math-submit-btn" id="math-submit">OK</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="fullscreen-success" id="success-screen">
-    <div>Kriz Yönetildi. Gerçek Dünyaya Dönebilirsin.</div>
-    <div style="font-size: 14px; font-weight: normal; margin-top: 10px; color: #bbf7d0;">Bu sayfayı güvenle kapatabilirsin.</div>
+    <div>Kriz Yönetildi. Sözleşme Mühürlendi. Gerçek Dünyaya Dönebilirsin.</div>
+    <div style="font-size: 13px; font-weight: normal; margin-top: 8px; color: #bbf7d0;">Bu sayfayı güvenle kapatabilirsin.</div>
 </div>
 
 <script>
@@ -229,121 +610,353 @@
     const audio = document.getElementById('crisis-audio');
     const bBox = document.getElementById('b-box');
     const breathText = document.getElementById('breath-text');
-    const target = document.getElementById('game-target');
-    const gameArea = document.getElementById('g-area');
-    const scoreVal = document.getElementById('score-val');
+    const breathPath = document.getElementById('breath-path');
     const mainWrapper = document.getElementById('main-wrapper');
     const successScreen = document.getElementById('success-screen');
     
-    const phases = ["Nefes Al (4 Saniye)", "Nefesini Tut (4 Saniye)", "Nefes Ver (4 Saniye)", "Bekle (4 Saniye)"];
-    let currentPhase = 0;
-    let score = 0;
-    let gameInterval;
-    let gameSpeed = 1200;
+    // Sayaç Elementleri
+    const timerBox = document.getElementById('session-timer-box');
+    const ringCircle = document.getElementById('countdown-ring');
+    const timeText = document.getElementById('time-text-display');
 
-    // Şarkı Sesini %25 Yap
+    let sessionStarted = false;
+    const phases = ["Nefes Al (4 Saniye)", "Nefesini Tut (4 Saniye)", "Nefes Ver (4 Saniye)", "Bekle (4 Saniye)"];
+    const pathData = [
+        "M 0 110 Q 150 20, 300 20 T 600 20",   
+        "M 0 20 Q 150 20, 300 20 T 600 20",     
+        "M 0 20 Q 150 110, 300 110 T 600 110",  
+        "M 0 110 Q 150 110, 300 110 T 600 110"  
+    ];
+    let currentPhase = 0;
+
+    // Sayaç Değişkenleri (5 Dakika = 300 Saniye)
+    let totalTime = 300;
+    let timeLeft = totalTime;
+    let countdownInterval;
+
     audio.volume = 0.25;
 
     function cycleBreathing() {
         breathText.innerText = phases[currentPhase];
+        breathPath.setAttribute("d", pathData[currentPhase]);
+
+        if(currentPhase === 0) {
+            breathText.style.color = "var(--accent)";
+            breathPath.style.stroke = "var(--accent)";
+        } else if(currentPhase === 1) {
+            breathText.style.color = "#f59e0b"; 
+            breathPath.style.stroke = "#f59e0b";
+        } else if(currentPhase === 2) {
+            breathText.style.color = "var(--game-target)";
+            breathPath.style.stroke = "var(--game-target)";
+        } else if(currentPhase === 3) {
+            breathText.style.color = "var(--text-muted)";
+            breathPath.style.stroke = "var(--text-muted)";
+        }
         currentPhase = (currentPhase + 1) % phases.length;
     }
 
-    function moveTarget() {
-        const maxX = gameArea.clientWidth - target.clientWidth;
-        const maxY = gameArea.clientHeight - target.clientHeight;
-        target.style.left = Math.floor(Math.random() * maxX) + 'px';
-        target.style.top = Math.floor(Math.random() * maxY) + 'px';
+    // Geri Sayım Motoru (Halka ve Renk Animasyonlu)
+    function startCountdown() {
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                timeText.innerText = "00:00";
+                ringCircle.style.strokeDashoffset = "113";
+                ringCircle.style.stroke = "var(--success-bright)";
+                timeText.style.color = "var(--success-bright)";
+                return;
+            }
+            timeLeft--;
+            
+            // Dakika ve Saniye Hesaplama
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            timeText.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            // Çember İlerleme Animasyonu (Çevre = 2 * PI * r -> 2 * 3.1415 * 18 = ~113)
+            let offset = 113 - (113 * timeLeft) / totalTime;
+            ringCircle.style.strokeDashoffset = offset;
+
+            // Zaman azaldıkça rengi hafifçe uyarana çevir
+            if(timeLeft < 60) {
+                ringCircle.style.stroke = "var(--danger)";
+                timeText.style.color = "var(--danger)";
+            } else if(timeLeft < 180) {
+                ringCircle.style.stroke = "#f59e0b";
+                timeText.style.color = "#f59e0b";
+            }
+        }, 1000);
     }
 
-    // Oynat / Durdur Mantığı
     audioToggleBtn.addEventListener('click', () => {
-        if (audio.paused) {
-            audio.play();
-            audioToggleBtn.innerText = "Şarkıyı Durdur";
-        } else {
-            audio.pause();
-            audioToggleBtn.innerText = "Şarkıyı Devam Ettir";
-        }
-    });
-
-    target.addEventListener('click', (e) => {
-        e.stopPropagation();
-        score++;
-        scoreVal.innerText = score;
-        if (score % 5 === 0 && gameSpeed > 500) {
-            gameSpeed -= 150;
-            clearInterval(gameInterval);
-            gameInterval = setInterval(moveTarget, gameSpeed);
-        }
-        moveTarget();
+        if (audio.paused) { audio.play(); audioToggleBtn.innerText = "Şarkıyı Durdur"; }
+        else { audio.pause(); audioToggleBtn.innerText = "Şarkıyı Devam Ettir"; }
     });
 
     startBtn.addEventListener('click', () => {
-        audio.currentTime = 38; // 45. saniyeden başlar
-        audio.play().catch(error => console.log("Oynatma engellendi:", error));
+        audio.currentTime = 38;
+        audio.play().catch(e => console.log(e));
         
         startBtn.style.display = 'none';
         audioToggleBtn.style.display = 'block';
+        timerBox.style.display = 'flex'; // Sayacı Göster
         feelGoodBtn.style.display = 'block';
-        bBox.style.display = 'block';
+        bBox.style.display = 'flex';
 
+        sessionStarted = true;
         cycleBreathing();
         setInterval(cycleBreathing, 4000);
-        target.style.display = 'block';
-        moveTarget();
-        gameInterval = setInterval(moveTarget, gameSpeed);
+        startCountdown(); // Sayacı Başlat
+
+        for(let i=1; i<=5; i++) {
+            const btn = document.getElementById(`btn-launch-${i}`);
+            btn.removeAttribute('disabled');
+            btn.innerText = "BAŞLAT (TAM EKRAN)";
+        }
     });
 
-    // --- "İYİ HİSSEDİYORUM" BASILI TUTMA MANTIĞI ---
-    let holdTimer;
-    let colorProgress = 0; // 0 ile 100 arası renk yoğunluğu
+    function requestFull(elem) {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    }
+
+    function exitGame() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+
+    document.addEventListener('fullscreenchange', onFullscreenClose);
+    document.addEventListener('webkitfullscreenchange', onFullscreenClose);
+
+    function onFullscreenClose() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            clearInterval(loop1);
+            clearInterval(loop3);
+            document.getElementById('canvas-3').innerHTML = '';
+            generatedMatrix = [];
+        }
+    }
+
+    for(let i=1; i<=5; i++) {
+        document.getElementById(`btn-launch-${i}`).addEventListener('click', () => {
+            if(!sessionStarted) return;
+            const container = document.getElementById(`container-game-${i}`);
+            requestFull(container);
+            setTimeout(() => initGame(i), 150);
+        });
+    }
+
+    function initGame(gameId) {
+        if (gameId === 1) startGame1();
+        if (gameId === 2) startGame2();
+        if (gameId === 3) startGame3();
+        if (gameId === 4) startGame4();
+        if (gameId === 5) startGame5();
+    }
+
+    // ---------- OYUN 1: KÜRE AVI ----------
+    let loop1, score1 = 0, gameSpeed1 = 1200;
+    const target1 = document.getElementById('target-1');
+    const canvas1 = document.getElementById('canvas-1');
+    const display1 = document.getElementById('score-val-1');
+
+    function startGame1() {
+        score1 = 0; gameSpeed1 = 1200; display1.innerText = score1;
+        repositionTarget1();
+        clearInterval(loop1);
+        loop1 = setInterval(repositionTarget1, gameSpeed1);
+    }
+    function repositionTarget1() {
+        const maxX = canvas1.clientWidth - 50;
+        const maxY = canvas1.clientHeight - 50;
+        target1.style.left = Math.floor(Math.random() * Math.max(maxX, 10)) + 'px';
+        target1.style.top = Math.floor(Math.random() * Math.max(maxY, 10)) + 'px';
+    }
+    target1.addEventListener('pointerdown', (e) => {
+        e.stopPropagation(); score1++; display1.innerText = score1;
+        if(score1 % 5 === 0 && gameSpeed1 > 500) {
+            gameSpeed1 -= 150; clearInterval(loop1); loop1 = setInterval(repositionTarget1, gameSpeed1);
+        }
+        repositionTarget1();
+    });
+
+    // ---------- OYUN 2: HAFIZA MATRİSİ ----------
+    let generatedMatrix = [], userMatrix = [], score2 = 0, matrixShowing = false;
+    const matrixButtons = document.querySelectorAll('.matrix-btn');
+    const display2 = document.getElementById('score-val-2');
+
+    function startGame2() {
+        score2 = 0; display2.innerText = score2; generatedMatrix = [];
+        nextMatrixStep();
+    }
+    function nextMatrixStep() {
+        userMatrix = []; generatedMatrix.push(Math.floor(Math.random() * 9));
+        showMatrixPattern();
+    }
+    function showMatrixPattern() {
+        matrixShowing = true; let idx = 0;
+        const intr = setInterval(() => {
+            if(idx >= generatedMatrix.length) { clearInterval(intr); matrixShowing = false; return; }
+            const btnNum = generatedMatrix[idx];
+            matrixButtons[btnNum].classList.add('active');
+            setTimeout(() => matrixButtons[btnNum].classList.remove('active'), 400);
+            idx++;
+        }, 750);
+    }
+    matrixButtons.forEach(btn => {
+        btn.addEventListener('pointerdown', () => {
+            if(matrixShowing || generatedMatrix.length === 0) return;
+            const clickIdx = parseInt(btn.getAttribute('data-index'));
+            userMatrix.push(clickIdx);
+            btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 180);
+
+            if(userMatrix[userMatrix.length - 1] !== generatedMatrix[userMatrix.length - 1]) {
+                startGame2(); return;
+            }
+            if(userMatrix.length === generatedMatrix.length) {
+                score2++; display2.innerText = score2; setTimeout(nextMatrixStep, 700);
+            }
+        });
+    });
+
+    // ---------- OYUN 3: ZEN BALON PATLATMA ----------
+    let loop3, score3 = 0;
+    const canvas3 = document.getElementById('canvas-3');
+    const display3 = document.getElementById('score-val-3');
+
+    function startGame3() {
+        score3 = 0; display3.innerText = score3; canvas3.innerHTML = '';
+        clearInterval(loop3);
+        loop3 = setInterval(spawnBubble, 950);
+    }
+    function spawnBubble() {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble-node';
+        bubble.style.left = Math.random() * (canvas3.clientWidth - 55) + 'px';
+        let currentBottom = -55;
+        bubble.style.bottom = currentBottom + 'px';
+        
+        bubble.addEventListener('pointerdown', () => {
+            score3++; display3.innerText = score3; bubble.remove();
+        });
+        canvas3.appendChild(bubble);
+
+        let speed = canvas3.clientHeight < 400 ? 2.2 : 3.5;
+        let upInterval = setInterval(() => {
+            if (!bubble.parentElement) { clearInterval(upInterval); return; }
+            currentBottom += speed;
+            bubble.style.bottom = currentBottom + 'px';
+            if (currentBottom > canvas3.clientHeight) { clearInterval(upInterval); bubble.remove(); }
+        }, 16);
+    }
+
+    // ---------- OYUN 4: KAOS ENGELLEYİCİ (STROOP) ----------
+    let score4 = 0, correctColorName = "";
+    const wordDisplay = document.getElementById('stroop-word');
+    const optionsRow = document.getElementById('stroop-options');
+    const display4 = document.getElementById('score-val-4');
+    
+    const colorMatrixData = [
+        { name: "KIRMIZI", hex: "#ef4444" },
+        { name: "MAVİ", hex: "#38bdf8" },
+        { name: "YEŞİL", hex: "#4ade80" },
+        { name: "SARI", hex: "#f59e0b" }
+    ];
+
+    function startGame4() {
+        score4 = 0; display4.innerText = score4;
+        drawStroopRound();
+    }
+    function drawStroopRound() {
+        optionsRow.innerHTML = '';
+        const wordData = colorMatrixData[Math.floor(Math.random() * colorMatrixData.length)];
+        const colorData = colorMatrixData[Math.floor(Math.random() * colorMatrixData.length)];
+        
+        wordDisplay.innerText = wordData.name;
+        wordDisplay.style.color = colorData.hex;
+        correctColorName = colorData.name;
+
+        const shuffled = [...colorMatrixData].sort(() => Math.random() - 0.5);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'color-pick-btn';
+            btn.style.backgroundColor = opt.hex;
+            btn.innerText = opt.name;
+            btn.addEventListener('pointerdown', () => {
+                if(opt.name === correctColorName) {
+                    score4++; display4.innerText = score4; drawStroopRound();
+                } else {
+                    startGame4();
+                }
+            });
+            optionsRow.appendChild(btn);
+        });
+    }
+
+    // ---------- OYUN 5: MATEMATİK ODAKLANMA ----------
+    let score5 = 0, currentAnswer = 0;
+    const mathQuestion = document.getElementById('math-question');
+    const mathInput = document.getElementById('math-input');
+    const mathSubmit = document.getElementById('math-submit');
+    const display5 = document.getElementById('score-val-5');
+
+    function startGame5() {
+        score5 = 0; display5.innerText = score5;
+        generateMathProblem();
+    }
+    function generateMathProblem() {
+        mathInput.value = '';
+        const ops = ['+', '-', '*'];
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let n1, n2;
+
+        if (op === '+') { n1 = Math.floor(Math.random() * 40) + 10; n2 = Math.floor(Math.random() * 40) + 10; currentAnswer = n1 + n2; }
+        else if (op === '-') { n1 = Math.floor(Math.random() * 50) + 20; n2 = Math.floor(Math.random() * 19) + 1; currentAnswer = n1 - n2; }
+        else { n1 = Math.floor(Math.random() * 9) + 2; n2 = Math.floor(Math.random() * 8) + 2; currentAnswer = n1 * n2; }
+
+        mathQuestion.innerText = `${n1} ${op} ${n2}`;
+        setTimeout(() => mathInput.focus(), 50);
+    }
+    function checkMathAnswer() {
+        const val = parseInt(mathInput.value);
+        if (val === currentAnswer) { score5++; display5.innerText = score5; generateMathProblem(); }
+        else { startGame5(); }
+    }
+    mathSubmit.addEventListener('click', checkMathAnswer);
+    mathInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkMathAnswer(); });
+
+    // --- "İYİ HİSSEDİYORUM" BASILI TUTMA MOTORU ---
+    let holdTimer, colorProgress = 0;
 
     function startHolding() {
         holdTimer = setInterval(() => {
             if (colorProgress < 100) {
-                colorProgress += 2; // Dönüşüm hızı
-                // Arka plan rengini yavaşça yeşile (#15803d) yaklaştır
-                document.body.style.backgroundColor = `mix(#0f141c, #15803d, ${100 - colorProgress}%)`;
-                // Modern tarayıcılar için rgb interpolasyonu
+                colorProgress += 2.5;
                 document.body.style.backgroundColor = `rgb(${15 + (6 - 15) * (colorProgress/100)}, ${20 + (128 - 20) * (colorProgress/100)}, ${28 + (61 - 28) * (colorProgress/100)})`;
-            } else {
-                // %100 olduğunda tetiklenecek son işlemler
-                clearInterval(holdTimer);
-                triggerSuccess();
-            }
+            } else { clearInterval(holdTimer); triggerSuccess(); }
         }, 30);
     }
 
     function stopHolding() {
         clearInterval(holdTimer);
-        // Bırakınca yavaşça eski rengine sıfırla
         holdTimer = setInterval(() => {
             if (colorProgress > 0) {
-                colorProgress -= 5;
+                colorProgress -= 6;
                 document.body.style.backgroundColor = `rgb(${15 + (6 - 15) * (colorProgress/100)}, ${20 + (128 - 20) * (colorProgress/100)}, ${28 + (61 - 28) * (colorProgress/100)})`;
-            } else {
-                clearInterval(holdTimer);
-                document.body.style.backgroundColor = ''; // Varsayılana dön
-            }
+            } else { clearInterval(holdTimer); document.body.style.backgroundColor = ''; }
         }, 20);
     }
 
     function triggerSuccess() {
-        audio.pause();
-        mainWrapper.style.opacity = '0';
+        audio.pause(); clearInterval(countdownInterval); mainWrapper.style.opacity = '0';
         setTimeout(() => {
-            mainWrapper.style.display = 'none';
-            successScreen.style.display = 'flex';
-            
-            // Tarayıcı sekmesini kapatmayı dene (Güvenlik izin verirse)
-            setTimeout(() => {
-                window.close();
-            }, 1500);
+            mainWrapper.style.display = 'none'; successScreen.style.display = 'flex';
+            setTimeout(() => { window.close(); }, 1500);
         }, 500);
     }
 
-    // Hem mouse hem dokunmatik ekranlar için event listener tanımlamaları
     feelGoodBtn.addEventListener('pointerdown', startHolding);
     window.addEventListener('pointerup', stopHolding);
 </script>
