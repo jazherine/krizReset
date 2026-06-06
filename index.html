@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zihinsel Alan / Dur ve Odaklan</title>
+    <style>
+        :root {
+            --bg-color: #0f141c;
+            --card-bg: #161f2d;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --game-target: #4ade80;
+            --border: #223147;
+            --success: #15803d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background-color 0.1s linear; /* Ekranın yeşile dönme animasyonu için */
+        }
+
+        .wrapper {
+            display: flex;
+            max-width: 1100px;
+            width: 100%;
+            gap: 20px;
+            transition: opacity 0.5s ease;
+        }
+
+        .left-panel {
+            flex: 1.2;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        .right-panel {
+            flex: 0.8;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2 {
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 0;
+            letter-spacing: -0.5px;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 24px; }
+        h2 { font-size: 20px; margin-bottom: 15px; }
+
+        p { margin-bottom: 20px; font-size: 15px; }
+        .highlight { color: var(--accent); font-weight: 500; }
+
+        .steps { margin: 20px 0; padding: 0; list-style: none; }
+        .steps li { position: relative; padding-left: 25px; margin-bottom: 12px; font-size: 14px; }
+        .steps li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--accent); font-weight: bold; }
+
+        /* Butonlar */
+        .primary-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: background 0.2s;
+        }
+
+        .audio-ctrl-btn {
+            display: none; /* İlk başta gizli */
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .feel-good-btn {
+            display: none; /* İlk başta gizli */
+            width: 100%;
+            padding: 18px;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;
+            user-select: none; /* Metin seçilmeyi engellemek için */
+            -webkit-user-select: none;
+        }
+
+        /* Oyun Alanı */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            cursor: crosshair;
+        }
+
+        .target {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: var(--game-target);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--game-target);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            display: none;
+        }
+
+        .score-board { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
+
+        .breathing-box {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .timer { font-size: 13px; color: var(--accent); font-weight: bold; text-transform: uppercase; }
+        .footer-note { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; margin-top: 20px; text-align: center; }
+
+        /* Tam Ekran Kapanış Modu */
+        .fullscreen-success {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--success);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper" id="main-wrapper">
+    <div class="left-panel">
+        <h1>Şu Anda Güvendesin. Dur ve Bunu Oku.</h1>
+        
+        <button class="primary-btn" id="start-session">ZİHNİNİ VE SESİ BAŞLAT</button>
+        <button class="audio-ctrl-btn" id="audio-toggle">Şarkıyı Durdur</button>
+        
+        <audio id="crisis-audio" src="durbidakika.mp3" preload="auto"></audio>
+
+        <div class="breathing-box" id="b-box">
+            <div class="timer" id="breath-text">Zihnini yavaşlatmak için sayfaya odaklan...</div>
+        </div>
+
+        <p>Bu sayfayı açtın çünkü şu an beyninin ilkel kısmı seni <span class="highlight">bağımlı bir davranışa</span> doğru sürüklüyor. Bu geçici bir kimyasal dalgadır, emir değildir.</p>
+
+        <h3>Rasyonel Gerçekler:</h3>
+        <ul class="steps">
+            <li><strong>Yanılsama:</strong> Bu davranış sana huzur vermeyecek, sadece derin bir pişmanlık getirecek.</li>
+            <li><strong>Zaman Sınırı:</strong> Bu yoğun fiziksel baskı en fazla 10-15 dakika sürer, sonra kendiliğinden söner.</li>
+            <li><strong>Nörolojik Gelişim:</strong> Şu an "hayır" dediğin her saniye, eski bağımlılık yollarını fiziksel olarak zayıflatıyorsun.</li>
+        </ul>
+    </div>
+
+    <div class="right-panel">
+        <h2>Dikkat Dağıtma İstasyonu</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">Yeşil küreleri yakalayarak acil dürtü odağını fiziksel bir göreve kaydır.</p>
+        
+        <div class="score-board">Skor: <span id="score-val" class="highlight">0</span></div>
+        
+        <div class="game-area" id="g-area">
+            <div class="target" id="game-target"></div>
+        </div>
+
+        <button class="feel-good-btn" id="feel-good">İyi Hissediyorum (Basılı Tut)</button>
+    </div>
+</div>
+
+<div class="fullscreen-success" id="success-screen">
+    <div>Kriz Yönetildi. Gerçek Dünyaya Dönebilirsin.</div>
+    <div style="font-size: 14px; font-weight: normal; margin-top: 10px; color: #bbf7d0;">Bu sayfayı güvenle kapatabilirsin.</div>
+</div>
+
+<script>
+    const startBtn = document.getElementById('start-session');
+    const audioToggleBtn = document.getElementById('audio-toggle');
+    const feelGoodBtn = document.getElementById('feel-good');
+    const audio = document.getElementById('crisis-audio');
+    const bBox = document.getElementById('b-box');
+    const breathText = document.getElementById('breath-text');
+    const target = document.getElementById('game-target');
+    const gameArea = document.getElementById('g-area');
+    const scoreVal = document.getElementById('score-val');
+    const mainWrapper = document.getElementById('main-wrapper');
+    const successScreen = document.getElementById('success-screen');
+    
+    const phases = ["Nefes Al (4 Saniye)", "Nefesini Tut (4 Saniye)", "Nefes Ver (4 Saniye)", "Bekle (4 Saniye)"];
+    let currentPhase = 0;
+    let score = 0;
+    let gameInterval;
+    let gameSpeed = 1200;
+
+    // Şarkı Sesini %25 Yap
+    audio.volume = 0.25;
+
+    function cycleBreathing() {
+        breathText.innerText = phases[currentPhase];
+        currentPhase = (currentPhase + 1) % phases.length;
+    }
+
+    function moveTarget() {
+        const maxX = gameArea.clientWidth - target.clientWidth;
+        const maxY = gameArea.clientHeight - target.clientHeight;
+        target.style.left = Math.floor(Math.random() * maxX) + 'px';
+        target.style.top = Math.floor(Math.random() * maxY) + 'px';
+    }
+
+    // Oynat / Durdur Mantığı
+    audioToggleBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+            audioToggleBtn.innerText = "Şarkıyı Durdur";
+        } else {
+            audio.pause();
+            audioToggleBtn.innerText = "Şarkıyı Devam Ettir";
+        }
+    });
+
+    target.addEventListener('click', (e) => {
+        e.stopPropagation();
+        score++;
+        scoreVal.innerText = score;
+        if (score % 5 === 0 && gameSpeed > 500) {
+            gameSpeed -= 150;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(moveTarget, gameSpeed);
+        }
+        moveTarget();
+    });
+
+    startBtn.addEventListener('click', () => {
+        audio.currentTime = 38; // 45. saniyeden başlar
+        audio.play().catch(error => console.log("Oynatma engellendi:", error));
+        
+        startBtn.style.display = 'none';
+        audioToggleBtn.style.display = 'block';
+        feelGoodBtn.style.display = 'block';
+        bBox.style.display = 'block';
+
+        cycleBreathing();
+        setInterval(cycleBreathing, 4000);
+        target.style.display = 'block';
+        moveTarget();
+        gameInterval = setInterval(moveTarget, gameSpeed);
+    });
+
+    // --- "İYİ HİSSEDİYORUM" BASILI TUTMA MANTIĞI ---
+    let holdTimer;
+    let colorProgress = 0; // 0 ile 100 arası renk yoğunluğu
+
+    function startHolding() {
+        holdTimer = setInterval(() => {
+            if (colorProgress < 100) {
+                colorProgress += 2; // Dönüşüm hızı
+                // Arka plan rengini yavaşça yeşile (#15803d) yaklaştır
+                document.body.style.backgroundColor = `mix(#0f141c, #15803d, ${100 - colorProgress}%)`;
+                // Modern tarayıcılar için rgb interpolasyonu
+                document.body.style.backgroundColor = `rgb(${15 + (6 - 15) * (colorProgress/100)}, ${20 + (128 - 20) * (colorProgress/100)}, ${28 + (61 - 28) * (colorProgress/100)})`;
+            } else {
+                // %100 olduğunda tetiklenecek son işlemler
+                clearInterval(holdTimer);
+                triggerSuccess();
+            }
+        }, 30);
+    }
+
+    function stopHolding() {
+        clearInterval(holdTimer);
+        // Bırakınca yavaşça eski rengine sıfırla
+        holdTimer = setInterval(() => {
+            if (colorProgress > 0) {
+                colorProgress -= 5;
+                document.body.style.backgroundColor = `rgb(${15 + (6 - 15) * (colorProgress/100)}, ${20 + (128 - 20) * (colorProgress/100)}, ${28 + (61 - 28) * (colorProgress/100)})`;
+            } else {
+                clearInterval(holdTimer);
+                document.body.style.backgroundColor = ''; // Varsayılana dön
+            }
+        }, 20);
+    }
+
+    function triggerSuccess() {
+        audio.pause();
+        mainWrapper.style.opacity = '0';
+        setTimeout(() => {
+            mainWrapper.style.display = 'none';
+            successScreen.style.display = 'flex';
+            
+            // Tarayıcı sekmesini kapatmayı dene (Güvenlik izin verirse)
+            setTimeout(() => {
+                window.close();
+            }, 1500);
+        }, 500);
+    }
+
+    // Hem mouse hem dokunmatik ekranlar için event listener tanımlamaları
+    feelGoodBtn.addEventListener('pointerdown', startHolding);
+    window.addEventListener('pointerup', stopHolding);
+</script>
+
+</body>
+</html>
