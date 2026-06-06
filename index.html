@@ -38,7 +38,6 @@
             box-sizing: border-box;
         }
 
-        /* İç Kaydırmayı Engelleyen ve Bütünlüğü Sağlayan Ana Taşıyıcı */
         .wrapper {
             display: flex;
             flex-direction: row;
@@ -58,7 +57,7 @@
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            height: auto; /* İç kaydırma çubukları tamamen kaldırıldı */
+            height: auto;
             overflow: visible;
         }
 
@@ -93,6 +92,63 @@
         .steps { margin: 15px 0; padding: 0; list-style: none; }
         .steps li { position: relative; padding-left: 25px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; color: var(--text-main); }
         .steps li::before { content: "✓"; position: absolute; left: 0; top: 2px; color: var(--accent); font-weight: bold; }
+
+        /* TAAHHÜTLER İÇİN ETKİLEŞİMLİ VE DURUM KONTROLLÜ TEMA */
+        .interactive-steps {
+            margin: 15px 0;
+            padding: 0;
+            list-style: none;
+        }
+        .interactive-steps li {
+            position: relative;
+            padding: 12px 45px 12px 15px;
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Basılı Tutulma Esnasında Mavi Parlama Efekti */
+        .interactive-steps li.holding {
+            background: rgba(56, 189, 248, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+
+        /* Tam Onaylandığında Sönükleşip Kapanma Durumu */
+        .interactive-steps li.approved {
+            opacity: 0.35;
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(34, 49, 71, 0.5);
+            color: var(--text-muted);
+            pointer-events: none; /* Artık tıklanamaz */
+            box-shadow: none;
+        }
+
+        /* Sağ Taraftaki Animasyonlu Yeşil Tik */
+        .interactive-steps li::after {
+            content: "✓";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            color: var(--success-bright);
+            font-weight: 900;
+            font-size: 18px;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        }
+        .interactive-steps li.approved::after {
+            transform: translateY(-50%) scale(1);
+            opacity: 1;
+        }
 
         .primary-btn {
             display: block;
@@ -130,7 +186,6 @@
             margin-bottom: 15px;
         }
 
-        /* YENİ NESİL ANİMASYONLU 5 DAKİKA SAYAÇ ALANI */
         .session-timer-box {
             display: none;
             align-items: center;
@@ -170,6 +225,7 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
+        /* GÜVENLİK KİLİTLİ ONAY BUTONU */
         .feel-good-btn {
             display: none;
             width: 100%;
@@ -184,6 +240,17 @@
             margin-top: 10px;
             user-select: none;
             -webkit-user-select: none;
+            transition: all 0.3s ease;
+        }
+        
+        .feel-good-btn:disabled {
+            background-color: #1e293b !important;
+            color: #64748b !important;
+            border: 1px solid #334155 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+            opacity: 0.6;
         }
 
         .breathing-box {
@@ -423,7 +490,6 @@
             z-index: 9999;
         }
 
-        /* RESPONSIVE FILTER */
         @media (max-width: 820px) {
             body { padding: 10px; align-items: flex-start; }
             .wrapper { flex-direction: column; gap: 15px; }
@@ -449,7 +515,7 @@
     <div class="left-panel">
         <h1>Şu Anda Güvendesin. Dur ve Bunu Oku.</h1>
         
-        <button class="primary-btn" id="start-session">ZİHNİNİ VE SESİ BAŞLAT</button>
+        <button class="primary-btn" id="start-session">DUR NEFES AL VE ODAKLAN</button>
         <button class="audio-ctrl-btn" id="audio-toggle">Şarkıyı Durdur</button>
         
         <div class="session-timer-box" id="session-timer-box">
@@ -482,11 +548,11 @@
         </ul>
 
         <h3>Taahhütlerim ve Sözlerim:</h3>
-        <ul class="steps" style="color: var(--text-muted);">
-            <li>Dürtü geldiğinde teslim olmayacağıma ve bu kriz ekranını tam konsantrasyonla tamamlayacağıma,</li>
-            <li>Anlık zevk arayışlarının gelecekteki benliğime vereceği zararı kabul ettiğime,</li>
-            <li>Kendi irademin, beynimin ilkel dopamin dürtülerinden çok daha güçlü olduğunu kanıtlayacağıma,</li>
-            <li>Buradaki görevleri bitirmeden ve aşağıdaki butona basılı tutarak kendimi tamamen sakinleştirmeden sayfayı terk etmeyeceğime söz veriyorum.</li>
+        <ul class="interactive-steps" id="promises-list">
+            <li data-approved="false">Dürtü geldiğinde teslim olmayacağıma ve bu kriz ekranını tam konsantrasyonla tamamlayacağıma söz veriyorum.</li>
+            <li data-approved="false">Anlık zevk arayışlarının gelecekteki benliğime vereceği zararı kabul ettiğime söz veriyorum.</li>
+            <li data-approved="false">Kendi irademin, beynimin ilkel dopamin dürtülerinden çok daha güçlü olduğunu kanıtlayacağıma söz veriyorum.</li>
+            <li data-approved="false">Buradaki görevleri bitirmeden ve aşağıdaki butona basılı tutarak kendimi tamamen sakinleştirmeden sayfayı terk etmeyeceğime söz veriyorum.</li>
         </ul>
 
         <p style="font-size: 11px; border-top: 1px solid var(--border); padding-top: 15px; margin-top: 15px; color: var(--text-muted); font-style: italic;">
@@ -506,7 +572,7 @@
         <div class="station-section">
             <h2>İstasyon 2: Hafıza Matrisi</h2>
             <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Yanan sıralı panelleri aklında tut ve aynı sırayla tekrar et.</p>
-            <button class="game-launcher-btn" id="btn-launch-2" disabled>Oyun Kilitli (Önce Başlatın)</button>
+            <button class="game-launcher-btn" id="btn-launch-2" disabled>Oyun Kilitli (ÖQXce Başlatın)</button>
         </div>
 
         <div class="station-section">
@@ -527,7 +593,7 @@
             <button class="game-launcher-btn" id="btn-launch-5" disabled>Oyun Kilitli (Önce Başlatın)</button>
         </div>
 
-        <button class="feel-good-btn" id="feel-good">Sözümü Onaylıyorum ve İyi Hissediyorum (Basılı Tut)</button>
+        <button class="feel-good-btn" id="feel-good" disabled>Sözümü Onaylıyorum ve İyi Hissediyorum (Basılı Tut)</button>
     </div>
 </div>
 
@@ -614,10 +680,10 @@
     const mainWrapper = document.getElementById('main-wrapper');
     const successScreen = document.getElementById('success-screen');
     
-    // Sayaç Elementleri
     const timerBox = document.getElementById('session-timer-box');
     const ringCircle = document.getElementById('countdown-ring');
     const timeText = document.getElementById('time-text-display');
+    const promiseItems = document.querySelectorAll('#promises-list li');
 
     let sessionStarted = false;
     const phases = ["Nefes Al (4 Saniye)", "Nefesini Tut (4 Saniye)", "Nefes Ver (4 Saniye)", "Bekle (4 Saniye)"];
@@ -629,7 +695,6 @@
     ];
     let currentPhase = 0;
 
-    // Sayaç Değişkenleri (5 Dakika = 300 Saniye)
     let totalTime = 300;
     let timeLeft = totalTime;
     let countdownInterval;
@@ -656,7 +721,6 @@
         currentPhase = (currentPhase + 1) % phases.length;
     }
 
-    // Geri Sayım Motoru (Halka ve Renk Animasyonlu)
     function startCountdown() {
         clearInterval(countdownInterval);
         countdownInterval = setInterval(() => {
@@ -670,16 +734,13 @@
             }
             timeLeft--;
             
-            // Dakika ve Saniye Hesaplama
             let mins = Math.floor(timeLeft / 60);
             let secs = timeLeft % 60;
             timeText.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             
-            // Çember İlerleme Animasyonu (Çevre = 2 * PI * r -> 2 * 3.1415 * 18 = ~113)
             let offset = 113 - (113 * timeLeft) / totalTime;
             ringCircle.style.strokeDashoffset = offset;
 
-            // Zaman azaldıkça rengi hafifçe uyarana çevir
             if(timeLeft < 60) {
                 ringCircle.style.stroke = "var(--danger)";
                 timeText.style.color = "var(--danger)";
@@ -688,6 +749,56 @@
                 timeText.style.color = "#f59e0b";
             }
         }, 1000);
+    }
+
+    // --- SÖZLERİN BASILI TUTULMA VE KİLİT SİSTEMİ MOTORU ---
+    let promiseHoldTimer;
+    
+    promiseItems.forEach(item => {
+        item.addEventListener('pointerdown', (e) => {
+            if (!sessionStarted || item.getAttribute('data-approved') === 'true') return;
+            
+            item.classList.add('holding');
+            let progress = 0;
+            
+            clearInterval(promiseHoldTimer);
+            promiseHoldTimer = setInterval(() => {
+                progress += 5;
+                if (progress >= 100) {
+                    clearInterval(promiseHoldTimer);
+                    item.classList.remove('holding');
+                    item.classList.add('approved');
+                    item.setAttribute('data-approved', 'true');
+                    checkAllPromises(); // Diğer sözleri kontrol et
+                }
+            }, 50); // Yaklaşık 1 saniye basılı tutma süresi
+        });
+
+        // Kullanıcı parmağını veya fareyi çektiğinde döngüyü sıfırla
+        const cancelHold = () => {
+            clearInterval(promiseHoldTimer);
+            item.classList.remove('holding');
+        };
+        
+        item.addEventListener('pointerup', cancelHold);
+        item.addEventListener('pointerleave', cancelHold);
+    });
+
+    // Tüm sözlerin onaylanıp onaylanmadığını denetleyen fonksiyon
+    function checkAllPromises() {
+        let allApproved = true;
+        promiseItems.forEach(i => {
+            if (i.getAttribute('data-approved') !== 'true') {
+                allApproved = false;
+            }
+        });
+
+        if (allApproved) {
+            feelGoodBtn.removeAttribute('disabled');
+            feelGoodBtn.style.animation = "pulseButton 2s infinite"; // Onaylanınca parlasın
+        } else {
+            feelGoodBtn.setAttribute('disabled', 'true');
+        }
     }
 
     audioToggleBtn.addEventListener('click', () => {
@@ -701,14 +812,15 @@
         
         startBtn.style.display = 'none';
         audioToggleBtn.style.display = 'block';
-        timerBox.style.display = 'flex'; // Sayacı Göster
+        timerBox.style.display = 'flex'; 
         feelGoodBtn.style.display = 'block';
         bBox.style.display = 'flex';
 
         sessionStarted = true;
         cycleBreathing();
         setInterval(cycleBreathing, 4000);
-        startCountdown(); // Sayacı Başlat
+        startCountdown(); 
+        checkAllPromises(); // İlk kilit durumunu normalize et
 
         for(let i=1; i<=5; i++) {
             const btn = document.getElementById(`btn-launch-${i}`);
@@ -931,6 +1043,7 @@
     let holdTimer, colorProgress = 0;
 
     function startHolding() {
+        if(feelGoodBtn.hasAttribute('disabled')) return; // Güvenlik önlemi
         holdTimer = setInterval(() => {
             if (colorProgress < 100) {
                 colorProgress += 2.5;
