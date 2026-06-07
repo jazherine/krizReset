@@ -526,7 +526,7 @@
             <div class="time-text-display" id="time-text-display">05:00</div>
         </div>
         
-        <audio id="crisis-audio" src="durbidakika.mp3" preload="auto" loop></audio>
+        <audio id="crisis-audio" src="Citrus.mp3" preload="auto" loop></audio>
 
         <div class="breathing-box" id="b-box">
             <div class="timer" id="breath-text">Sakinleşmek için çizgi ritmine odaklan...</div>
@@ -807,7 +807,7 @@
     });
 
     startBtn.addEventListener('click', () => {
-        audio.currentTime = 38;
+        audio.currentTime = 0;
         audio.play().catch(e => console.log(e));
         
         startBtn.style.display = 'none';
